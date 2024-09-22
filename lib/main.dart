@@ -1,42 +1,41 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Lab',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: LoginPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
+class LoginPage extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  var _counter = 0.0; // Use var and initialize with 0.0
-  var myFontSize = 30.0; // Declare myFontSize and initialize with 30.0
+class _LoginPageState extends State<LoginPage> {
+  // Variables to store user input
+  String loginName = '';
+  String password = '';
+  String imageSource = 'images/question-mark.png'; // Initial image
 
-  void setNewValue(double newValue) {
+  // Function to handle login button click
+  void _checkPassword() {
     setState(() {
-      _counter = newValue;
-      myFontSize = newValue; // Update myFontSize with newValue
+      if (password == 'QWERTY123') {
+        imageSource = 'images/idea.png';
+      } else {
+        imageSource = 'images/stop.png';
+      }
     });
   }
 
@@ -44,37 +43,39 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text('Login Page'),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            // Remove the const keyword and apply TextStyle using myFontSize
-            Text(
-              'You have pushed the button this many times:',
-              style: TextStyle(fontSize: myFontSize), // Use myFontSize in TextStyle
+            TextField(
+              decoration: InputDecoration(labelText: 'Login name'),
+              onChanged: (value) {
+                loginName = value;
+              },
             ),
-            Text(
-              '$_counter',
-              style: TextStyle(fontSize: myFontSize), // Use myFontSize in TextStyle
+            TextField(
+              decoration: InputDecoration(labelText: 'Password'),
+              obscureText: true,
+              onChanged: (value) {
+                password = value;
+              },
             ),
-            Slider(
-              value: _counter,
-              min: 0,
-              max: 100,
-              divisions: 100,
-              label: _counter.round().toString(),
-              onChanged: setNewValue, // Call setNewValue() when slider is changed
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _checkPassword,
+              child: Text('Login'),
+            ),
+            SizedBox(height: 20),
+            Image.asset(
+              imageSource,
+              width: 300,
+              height: 300,
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => setNewValue(_counter + 1), // Increment _counter and myFontSize
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
