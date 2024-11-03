@@ -8,71 +8,103 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Lab',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: LoginPage(),
+      home: TodoListPage(),
     );
   }
 }
 
-class LoginPage extends StatefulWidget {
+class TodoListPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _TodoListPageState createState() => _TodoListPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  // Variables to store user input
-  String loginName = '';
-  String password = '';
-  String imageSource = 'images/question-mark.png'; // Initial image
+class _TodoListPageState extends State<TodoListPage> {
+  final TextEditingController _controller = TextEditingController();
+  List<String> _todoItems = [];
 
-  // Function to handle login button click
-  void _checkPassword() {
-    setState(() {
-      if (password == 'QWERTY123') {
-        imageSource = 'images/idea.png';
-      } else {
-        imageSource = 'images/stop.png';
-      }
-    });
+  void _addItem() {
+    if (_controller.text.isNotEmpty) {
+      setState(() {
+        _todoItems.add(_controller.text);
+        _controller.clear();
+      });
+    }
+  }
+
+  void _deleteItem(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Delete Item"),
+          content: Text("Are you sure you want to delete this item?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _todoItems.removeAt(index);
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text("Yes"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("No"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login Page'),
+        title: Text("To-Do List"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            TextField(
-              decoration: InputDecoration(labelText: 'Login name'),
-              onChanged: (value) {
-                loginName = value;
-              },
-            ),
-            TextField(
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-              onChanged: (value) {
-                password = value;
-              },
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _checkPassword,
-              child: Text('Login'),
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      hintText: 'Enter a to-do item',
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: _addItem,
+                  child: Text("Add"),
+                ),
+              ],
             ),
             SizedBox(height: 20),
-            Image.asset(
-              imageSource,
-              width: 300,
-              height: 300,
+            Expanded(
+              child: _todoItems.isEmpty
+                  ? Center(
+                child: Text("There are no items in the list"),
+              )
+                  : ListView.builder(
+                itemCount: _todoItems.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onLongPress: () => _deleteItem(index),
+                    child: ListTile(
+                      leading: Text("Item $index:"),
+                      title: Text(_todoItems[index]),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
